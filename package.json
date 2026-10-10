@@ -1,0 +1,25 @@
+{
+  "name": "flyrank-capstone-social-studio",
+  "version": "1.0.0",
+  "description": "Multi-platform social campaign publisher (FlyRank capstone CAP-social-a)",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --no-warnings bin/start-all.js",
+    "api": "node --no-warnings src/server.js",
+    "worker": "node --no-warnings src/jobs/runWorker.js",
+    "platform": "node --no-warnings src/fake-platform/run.js",
+    "seed": "node --no-warnings bin/seed.js",
+    "demo": "node --no-warnings bin/demo.js",
+    "test": "node --no-warnings --test --test-concurrency=1 test/"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.5"
+  }
+}
