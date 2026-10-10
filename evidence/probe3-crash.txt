@@ -1,0 +1,13 @@
+# Real processes (npm start stack; worker replaced by one started with CRASH_AFTER_PLATFORM_CALL=1, which exits 137
+# right after the platform accepted a post and before the result is saved), then restarted without the flag.
+campaign=cmp_f648e09e68398f07
+--- after crash (worker alive? 0)
+{"t":"2026-10-10T19:40:02.218Z","level":"info","name":"studio","msg":"worker started","pollMs":500}
+{"level":"error","msg":"CRASH_AFTER_PLATFORM_CALL: exiting abruptly"}
+instagram:publishing:ext=null  x:published:ext=post_2c569c66e488bb2d9e602894
+platform posts for campaign:
+x post_2c569c66e488bb2d9e602894
+# clock advanced 31s (lease expiry), worker restarted
+--- after restart
+instagram:published:attempts=2  x:published:attempts=1
+posts on platform: 2 (x,instagram) | total=6

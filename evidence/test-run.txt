@@ -1,0 +1,29 @@
+✔ validation: bad input is always a 4xx with details, never a 500
+✔ creating a campaign yields correctly sized images and different captions per platform
+✔ uploaded images work, and Idempotency-Key on create returns the same campaign
+✔ publish is idempotent over HTTP and the dashboard JSON reflects the state
+✔ captions differ per platform and both respect their length caps
+✔ X caption is trimmed to 280 chars for very long summaries and keeps its hashtags
+✔ brand voice is shared: changing it changes both platforms
+✔ instagram hashtag count follows the rule table
+✔ Instagram variant is exactly 1080x1080 and X is exactly 1600x900
+✔ subject stays inside the safe zone on every platform
+✔ a subject too wide for a crop falls back to contain (nothing cut off)
+✔ unknown platform is rejected
+✔ probe 1: publish twice, then retry after a dropped response -> exactly one post per platform
+✔ probe 2: 429 with Retry-After: 30 waits 30s (durably), then succeeds
+✔ probe 3: worker dies mid-batch (after platform accepted, before saving) -> restart creates zero duplicates
+✔ two workers on one database never claim the same entry
+✔ transient 503s back off exponentially, then permanent failure is recorded after max attempts
+✔ end to end: queued -> publishing -> published via signed delivery webhook
+✔ scheduled campaigns do nothing until their time; advancing the clock releases them
+✔ lost webhook: reconcile polls the platform and settles the entry
+✔ vault: round-trips, uses a fresh random IV, binds to the account, rejects tampering
+✔ probe 6: no plaintext token in the database file or the logs
+✔ logger redacts secrets even when a caller logs a whole object
+✔ expired token is refreshed transparently; a rejected token triggers one refresh-and-retry
+✔ Retry-After parsing: seconds, HTTP-date, junk
+✔ probe 4: forged webhook -> 400 and status unchanged; valid webhook -> published
+✔ a tampered body with a signature for the original body is rejected
+✔ replayed event_id is a no-op; failed delivery marks the entry failed
+✔ late 'published' beats a locally recorded failure; unknown entries are ignored; bad payloads are 400

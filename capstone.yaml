@@ -1,0 +1,23 @@
+name: flyrank-capstone-social-studio
+brief: CAP-social-a  # Multi-Platform Social Campaign Publisher
+base_url: http://localhost:3000
+run: npm start            # starts fake platform :4010, API :3000 and the worker as 3 processes (or: docker compose up --build)
+seed: npm run seed        # connects both OAuth accounts, creates a demo campaign (docker: docker compose run --rm seed)
+test: npm test
+demo: npm run demo        # scripted walkthrough of all five probes against the running stack
+node: ">=22.13"
+endpoints:
+  - { method: POST, path: /campaigns, note: "create + generate 1080x1080 / 1600x900 images and per-platform captions; honours Idempotency-Key" }
+  - { method: GET,  path: /campaigns }
+  - { method: GET,  path: /campaigns/:id }
+  - { method: POST, path: /campaigns/:id/publish, note: "queue for immediate publishing; idempotent" }
+  - { method: POST, path: /campaigns/:id/schedule, note: "body {at: ISO|epoch-ms}" }
+  - { method: GET,  path: /media/:campaignId/:platform.jpg }
+  - { method: POST, path: /webhook/social-delivery, note: "HMAC-SHA256 signed (x-signature: sha256=<hex>); forged -> 400" }
+  - { method: GET,  path: /dashboard }
+  - { method: GET,  path: /dashboard.json }
+  - { method: POST, path: /admin/clock/advance, note: "demo only (ENABLE_ADMIN=1): body {seconds}; advances the shared app clock" }
+  - { method: GET,  path: /health }
+fake_platform:
+  base_url: http://localhost:4010
+  note: "Own stand-in (the official starter was not available); faults via POST /__admin/faults, state via GET /__admin/state"

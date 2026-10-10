@@ -1,0 +1,42 @@
+# docker compose up --build          # platform (fake) + api + worker, shared /data volume
+# docker compose run --rm seed       # connect the demo accounts + create a demo campaign
+x-app: &app
+  build: .
+  image: social-studio
+  volumes: [data:/data]
+  environment: &env
+    PLATFORM_URL: http://platform:4010
+    WEBHOOK_URL: http://api:3000/webhook/social-delivery
+    PLATFORM_PORT: "4010"
+    PORT: "3000"
+services:
+  init:                      # makes /data writable for the unprivileged node user, generates secrets once
+    <<: *app
+    user: root
+    entrypoint: ["sh", "-c", "chown -R node:node /data"]
+    restart: "no"
+  platform:
+    <<: *app
+    command: ["node", "--no-warnings", "src/fake-platform/run.js"]
+    depends_on: { init: { condition: service_completed_successfully } }
+    ports: ["4010:4010"]
+  api:
+    <<: *app
+    ports: ["3000:3000"]
+    depends_on: { init: { condition: service_completed_successfully } }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      retries: 10
+  worker:
+    <<: *app
+    command: ["node", "--no-warnings", "src/jobs/runWorker.js"]
+    depends_on: { api: { condition: service_healthy } }
+    restart: unless-stopped
+  seed:
+    <<: *app
+    command: ["node", "--no-warnings", "bin/seed.js"]
+    profiles: ["seed"]
+    depends_on: { api: { condition: service_healthy }, platform: { condition: service_started } }
+volumes:
+  data:
