@@ -1,0 +1,49 @@
+ Container flyrank-capstone-social-studio-platform-1 Running 
+ Container flyrank-capstone-social-studio-api-1 Running 
+ Container flyrank-capstone-social-studio-init-1 Starting 
+ Container flyrank-capstone-social-studio-init-1 Started 
+ Container flyrank-capstone-social-studio-init-1 Waiting 
+ Container flyrank-capstone-social-studio-init-1 Waiting 
+ Container flyrank-capstone-social-studio-init-1 Exited 
+ Container flyrank-capstone-social-studio-init-1 Exited 
+ Container flyrank-capstone-social-studio-api-1 Waiting 
+ Container flyrank-capstone-social-studio-api-1 Healthy 
+ Container flyrank-capstone-social-studio-seed-run-fc864dc533d4 Creating 
+ Container flyrank-capstone-social-studio-seed-run-fc864dc533d4 Created 
+
+== 1. create campaign -> per-platform images and captions
+  PASS  created (HTTP 201)
+  instagram caption: Psst, guess what: Demo mv358w5e ✨ 🚀 ⏎  ⏎ Open studio day: free workshops, coffee, and a first look at our new prints. ⏎  ⏎ Tap the link in bio. ⏎  ⏎ #Demomv358w5e #Open #Studio #Free #Workshops
+  x caption        : Psst, guess what: Demo mv358w5e ⏎ Open studio day: free workshops, coffee, and a first look at our new prints. #Demomv358w5e #Open
+  PASS  captions differ per platform
+  PASS  x caption within 280 chars (128)
+  PASS  image variants {"instagram":"1080x1080","x":"1600x900"}
+
+== 2. schedule for +1h, advance the shared clock, worker publishes
+  PASS  scheduled (HTTP 200) -> {"instagram":"queued","x":"queued"}
+  PASS  still queued before its time
+  PASS  published after clock advance -> {"instagram":"published","x":"published"}
+
+== 3. idempotency hammer: 10 parallel publishes + same Idempotency-Key re-create
+  PASS  all 10 publish calls answered 2xx (200)
+  PASS  re-sent create with the same key returns the same campaign
+  PASS  platform holds exactly 1 post per platform for this campaign (2)
+
+== 4. 429 with Retry-After: 30 -> wait -> retry -> success
+  PASS  released to queued, next attempt in ~30s (Retry-After honoured)
+  PASS  not retried early
+  PASS  retried after the wait and published
+  PASS  exactly 1 post on the platform
+
+== 5. webhook: forged -> 400 (status unchanged), valid -> published
+  PASS  entry is 'publishing' with platform id post_5128b07084cb6f80c31a731d
+  PASS  forged signature -> HTTP 400
+  PASS  status unchanged after forged webhook
+  PASS  valid signature -> HTTP 200
+  PASS  status is now published
+
+== 6. summary
+  status counts: {"published":7,"publishing":1,"queued":2}
+  dashboard: http://api:3000/dashboard
+
+DEMO OK - all checks passed

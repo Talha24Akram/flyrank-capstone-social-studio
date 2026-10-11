@@ -26,5 +26,5 @@ the design in [`docs/DESIGN.md`](docs/DESIGN.md), but this log exists so nobody 
 
 ## What was NOT done / not verified
 - The official fake-platform starter was unavailable, so a stand-in was built (see README). Compatibility with the official one is untested.
-- Docker files are unverified (no Docker daemon was running on the build machine).
+- Docker: first written untested, then run end to end on 2026-10-11 (see README limitations for the one caveat: the host daemon has no iptables, so the image was built with `--network host`).
 - No stretch goals.

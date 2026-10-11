@@ -88,7 +88,7 @@ See `.env.example`. Secrets (`TOKEN_ENC_KEY` 32 bytes hex, `WEBHOOK_SECRET`, `OA
 - Fake platform state is in memory; restarting it forgets its posts (the app's own DB is durable).
 - Fault injection counts ("next N calls") rather than rates; `randomFailRate` is available for chaos.
 - Subject detection is not automatic: the caller may pass a `subject` box (fractions); default is the image centre.
-- Docker files were written but **not run** (no working Docker daemon on the machine used), only `docker compose config` was checked.
+- Docker was run end to end on the build machine on 2026-10-11 (image builds, `init` → `platform`/`api`/`worker` come up healthy, `seed` connects the accounts, the scripted demo passes 19/19 inside the compose network, and data survives `docker compose restart`; see `evidence/docker-demo-run.txt`). Caveat: that machine's Docker daemon runs with `iptables: false`, so the image was built with `docker build --network host` and the demo was run from a container on the compose network. A normal Docker install builds with plain `docker compose up --build`, which I could not exercise there.
 - Stretch goals (real platform publishing, A/B captions, approval flow, analytics) are not implemented.
 
 ## Repo map
